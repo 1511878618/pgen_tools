@@ -3,6 +3,26 @@ import numpy as np
 import pandas as pd
 import pgenlib as pg
 
+
+
+def read_pvar(pvar):
+    comment_lines = check_comment_lines(pvar)
+    return pd.read_csv(pvar, sep="\t", skiprows=comment_lines)
+
+
+def check_comment_lines(file, comment="##"):
+    with open (file, "r") as f:
+        idx = 0
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            if not line.startswith(comment):
+                break
+            idx += 1
+    return idx
+
+
 class PgenReaderFull():
     """
     Modify from  Pgenlib 0.90.1 
@@ -36,11 +56,12 @@ class PgenReaderFull():
         sample_list = [[FID, IID], ...]
         """
         self.sample_list = pd.read_csv(self.sample_path, sep='\t',low_memory=False).iloc[:, :2].values.tolist()
+        self.IID_list = [i[1] for i in self.sample_list]
     def _init_var(self):
         """
         load from pvar and to list[variant_id]
         """
-        self.var_list = pd.read_csv(self.pvar_path, sep='\t', low_memory=False).iloc[:, 2].tolist()
+        self.var_list = read_pvar(self.pvar_path).iloc[:, 2].tolist()
 
 
     @overload
@@ -64,22 +85,37 @@ class PgenReaderFull():
     def get_variant_idx(self, variant_id:List[str])->List[int]:...
     def get_variant_idx(self, variant_id:Union[str, List[str]])->Union[int, List[int]]:
         """
-        Modified version for interface
+        Modified version for interface, if not found return na
         """
         if isinstance(variant_id, str):
-            return self.var_list.index(variant_id)
+            try:
+                return self.var_list.index(variant_id)
+            except:
+                return None
         else:
             return [self.get_variant_idx(i) for i in variant_id]
         
     def get_sample_ids(self, sample_idx:Union[int, List[int]])->Union[str, List[str]]:
         """
-        TF version for get sample ids
+        TF version for get sample ids, if not found return na
         """
         if isinstance(sample_idx, int):
             return self.sample_list[sample_idx]
         else:
             return [self.get_sample_ids(i) for i in sample_idx]
 
+    def get_sample_idx_by_IID(self, sample_id:Union[str, List[str]])->Union[int, List[int]]:
+        """
+        TF version for get sample index by IID
+        """
+        if isinstance(sample_id, (str, int)):
+            try:
+                return self.IID_list.index(sample_id)
+            except:
+                print(f'{sample_id} not found in IID_list')
+                return None
+        else:
+            return [self.get_sample_idx_by_IID(i) for i in sample_id]
 
     def get_raw_sample_ct(self) -> int:
         """
@@ -153,13 +189,13 @@ class PgenReaderFull():
         return buf[:, sample_idx]
 
     @overload
-    def extract(self, variant_idx:List[int], variant_ids=None, allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
+    def extract(self, variant_idx:List[int],allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
     @overload
-    def extract(self, variant_idx:int, variant_ids=None, allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
+    def extract(self, variant_idx:int,  allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
     @overload
-    def extract(self, variant_ids:List[str], variant_idx=None, allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
+    def extract(self, variant_ids:List[str], allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
     @overload
-    def extract(self, variant_ids:str, variant_idx=None, allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
+    def extract(self, variant_ids:str, allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
     
     def extract(self, variant_idx=None, variant_ids=None, allele_idx=1, sample_idx=None, asFrame = False, na_rep=np.nan)->np.ndarray:
         """
