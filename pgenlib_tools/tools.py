@@ -242,6 +242,7 @@ class PgenReaderFull():
                 not_found_variants = [variant_ids[i] for i in variant_idx_not_found]
                 print(f'{",".join(not_found_variants)} not found in dataset')
                 variant_idx = [i for i in variant_idx if i is not None]
+                variant_ids = [i for i in variant_ids if i not in not_found_variants]
 
             extracted_geno = self.read_list(variant_idx, allele_idx, sample_idx)
             samples = self.get_sample_ids(sample_idx) if sample_idx else self.sample_list
