@@ -82,7 +82,12 @@ def getParser():
                         default=None,
                         help="groupby this column, default None"
                         )
-    
+    parser.add_argument("--ID",
+                        dest="ID",
+                        required=False,
+                        default="ID",
+                        help="ID column, default None"
+                        )
     parser.add_argument("-o","--output",
                         dest="ofile",
                         required=True,
@@ -147,6 +152,7 @@ if __name__ == "__main__":
     pfile = args.pfile
     sfile = args.sfile
     ofile = args.ofile
+    ID = args.ID
     Path(ofile).parent.mkdir(parents=True, exist_ok=True)
 
     method = args.method
@@ -199,7 +205,7 @@ if __name__ == "__main__":
             assert group_df['chr'].nunique() == 1, "More than 1 chr in" + groupName
             chrfile = get_chr_file(group_df['chr'].iloc[0])
             chrpgen = PgenReaderFull(pfile_path=chrfile)
-            variant_ids = group_df['ID'].tolist()
+            variant_ids = group_df[ID].tolist()
             df = chrpgen.extract(variant_ids =variant_ids,
                                 asFrame=True, na_rep=np.nan)
             
