@@ -180,7 +180,7 @@ if __name__ == "__main__":
         chrs = sfile_df[chrom].unique().tolist()
 
         for chr in chrs:
-            if not check_pfile_exists(pfile_folder / get_chr_file(chr)):
+            if not check_pfile_exists(get_chr_file(chr)):
                 raise ValueError(f"Check {get_chr_file(chr)} exists plz")
             
         res = []
