@@ -5,6 +5,11 @@ from setuptools import find_packages
 from setuptools import setup
 
 import pgenlib_tools
+import os 
+from pathlib import Path
+script_path = os.path.dirname(os.path.abspath(__file__)) + "/scripts"
+scripts = [str(i) for i in Path(script_path).rglob("*.py") if "pgenlib_tools" in str(i)]
+
 
 with open("requirements.txt") as file:
     REQUIRED_PACKAGES = file.read()
@@ -19,4 +24,6 @@ setup(
     author_email='xutingfeng@big.ac.cn',
     install_requires=REQUIRED_PACKAGES,
     packages=find_packages(),
+    scripts=scripts
+
     )
