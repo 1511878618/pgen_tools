@@ -32,6 +32,16 @@ def getParser():
 
         GWAS SSF: https://www.biorxiv.org/content/10.1101/2022.07.15.500230v1
         GWAS Standard
+        extract.py --pgen-folder data -s snplist/test.csv -c chr -g Gene -o extract/test.tsv --pgen-format ukb_wes_{} 
+
+        pgenfile is wes and named as ukb_wes_chr1 etc; all saved at --pgen-folder
+
+        with -c chr and -g Gene to split and load chr 
+
+        sfile examples
+        ID,Gene,global_MAF,EAS_MAF,Status,chr
+        1:160041478:G:GTT,KCNJ10,.,.,LOF,chr1
+        1:160041650:G:A,KCNJ10,.,.,LOF,chr1
 
         Version: 1.0
     
