@@ -138,11 +138,15 @@ def burdenSet(df, method = "carrier"):
     method == "carrier" means if one of them are carrier then set carrier as 1 
     """
     if method == "carrier":
-        df_carrier = (df.sum(axis=1) >= 1).astype(int) .to_frame().reset_index(drop=False)
-        df_carrier.columns = ["eid",'carrier']
-        df_carrier['carrier']
+        df_carrier = (df.sum(axis=1) >= 1).astype(int).to_frame().reset_index(drop=False)
+        df_carrier.columns = ["eid",method]
+
         
         return df_carrier
+    elif method == "sum":
+        df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
+        df_carrier.columns = ["eid",method]
+
     else:
         raise NotImplementedError(f"Not implemented for {method}")
 if __name__ == "__main__":
@@ -213,10 +217,10 @@ if __name__ == "__main__":
             print(df.sum(axis=0))
             df_burden = burdenSet(df)
             df_burden.rename(columns = {
-                "carrier": f"carrier_{groupName}"}, inplace=True
+                "carrier": f"{method}_{groupName}"}, inplace=True
             )
-            print(df_burden[f'carrier_{groupName}'].value_counts())
-            if df_burden[f'carrier_{groupName}'].sum() >1:
+            print(df_burden[f'{method}_{groupName}'].value_counts())
+            if df_burden[f'{method}_{groupName}'].sum() >1:
                 res.append(df_burden)
                 # df_burden.to_csv(saveDir/f"{groupName}.csv", index=False)
 
