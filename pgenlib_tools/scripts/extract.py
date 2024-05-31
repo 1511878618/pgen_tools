@@ -142,14 +142,15 @@ def burdenSet(df, method = "carrier"):
         df_carrier.columns = ["eid",method]
 
         
-        return df_carrier
     elif method == "sum":
         df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
-    # elif method == "none":
-    #     return df 
+
+
     else:
         raise NotImplementedError(f"Not implemented for {method}")
+    return df_carrier   
+
 if __name__ == "__main__":
     parser = getParser()
     args = parser.parse_args()
