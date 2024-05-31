@@ -7,9 +7,10 @@ from setuptools import setup
 import pgenlib_tools
 import os 
 from pathlib import Path
-script_path = os.path.dirname(os.path.abspath(__file__)) + "/scripts"
+script_path = os.path.dirname(os.path.abspath(__file__)) + "/pgenlib_tools/scripts"
+print(script_path)
 scripts = [str(i) for i in Path(script_path).rglob("*.py") if "pgenlib_tools" in str(i)]
-
+print(scripts)
 
 with open("requirements.txt") as file:
     REQUIRED_PACKAGES = file.read()
