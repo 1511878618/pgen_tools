@@ -139,8 +139,8 @@ def burdenSet(df, method = "carrier"):
     if method == "carrier":
         df_carrier = (df.sum(axis=1) >= 1).astype(int).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
-        df_burden.rename(columns={method: f"{method}_{groupName}"}, inplace=True)
-        print(df_burden[f"{method}_{groupName}"].value_counts())
+        df_carrier.rename(columns={method: f"{method}_{groupName}"}, inplace=True)
+        print(df_carrier[f"{method}_{groupName}"].value_counts())
     elif method == "sum":
         df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
