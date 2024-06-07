@@ -115,7 +115,6 @@ def load_data(x):
         raise ValueError(f"File format: {x} not supported")
 
 
-
 def check_pfile_exists(pfile):
     pfile = str(pfile)
     pgen = pfile + ".pgen"
@@ -140,12 +139,14 @@ def burdenSet(df, method = "carrier"):
     if method == "carrier":
         df_carrier = (df.sum(axis=1) >= 1).astype(int).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
-
-        
+        df_burden.rename(columns={method: f"{method}_{groupName}"}, inplace=True)
+        print(df_burden[f"{method}_{groupName}"].value_counts())
     elif method == "sum":
         df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
 
+    elif method == None or "none":
+        df_carrier = df
 
     else:
         raise NotImplementedError(f"Not implemented for {method}")
@@ -174,12 +175,11 @@ if __name__ == "__main__":
         if chrom is None:
             print("Please provide chromosome number")
             sys.exit(1)
-        
+
     if pfile is not None and pfile_folder is not None:
         print("Please do not provide pgen file and pgen folder at the same time")
         sys.exit(1)
 
-    
     if pfile is not None:  # only use one pfile to extract 
         pgen = PgenReaderFull(pfile_path=pfile)
         variant_ids = pd.read_csv(sfile).iloc[:, 0].tolist()
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         if chrom is None and group is None:
             print("Please provide chromosome number and group column")
             sys.exit(1)
-        # check all chrom in the pfile_folder 
+        # check all chrom in the pfile_folder
         pfile_folder = Path(pfile_folder)
         pfile_format = str(pfile_folder/pfile_format)
         get_chr_file = lambda x: pfile_format.format(x)
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         for chr in chrs:
             if not check_pfile_exists(get_chr_file(chr)):
                 raise ValueError(f"Check {get_chr_file(chr)} exists plz")
-            
+
         res = []
         for groupName, group_df in sfile_df.groupby(group):
             print(f"Extract {groupName}")
@@ -214,20 +214,17 @@ if __name__ == "__main__":
             variant_ids = group_df[ID].tolist()
             df = chrpgen.extract(variant_ids =variant_ids,
                                 asFrame=True, na_rep=np.nan)
-            
-            # only for carrier 
+
+            # only for carrier
             print(df.sum(axis=0))
             df_burden = burdenSet(df, method = method)
-            df_burden.rename(columns = {
-                method: f"{method}_{groupName}"}, inplace=True
-            )
-            print(df_burden[f'{method}_{groupName}'].value_counts())
-            if df_burden[f'{method}_{groupName}'].sum() >1:
-                res.append(df_burden)
-                # df_burden.to_csv(saveDir/f"{groupName}.csv", index=False)
 
-            else:
-                print(f"No carrier of {groupName}")
+            # if df_burden[f'{method}_{groupName}'].sum() >1:
+            if df.shape[0] == 0:
+                print(f"Empty for {groupName}")
+            # else:
+            res.append(df_burden)
+            # df_burden.to_csv(saveDir/f"{groupName}.csv", index=False)
 
             print("********************************************************")
         from functools import reduce 
