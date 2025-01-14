@@ -185,7 +185,7 @@ if __name__ == "__main__":
         variant_ids = pd.read_csv(sfile).iloc[:, 0].tolist()
         df = pgen.extract(variant_ids =variant_ids,
                         asFrame=True, na_rep=np.nan)
-        df_carrier = burdentSet(df, method)
+        df_carrier = burdenSet(df, method)
         if ofile.endswith(".csv"):
             df_carrier.to_csv(ofile, index=False)
         elif ofile.endswith(".tsv"):
