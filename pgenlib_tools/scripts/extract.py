@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
     if pfile is not None and pfile_folder is None:  # only use one pfile to extract
         pgen = PgenReaderFull(pfile_path=pfile)
-        variant_ids = pd.read_csv(sfile).iloc[:, 0].tolist()
+        variant_ids = load_data(sfile).iloc[:, 0].tolist()
         print(variant_ids[:4])
         df = pgen.extract(variant_ids =variant_ids,
                         asFrame=True, na_rep=np.nan)

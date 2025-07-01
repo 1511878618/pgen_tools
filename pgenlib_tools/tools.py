@@ -259,7 +259,7 @@ class PgenReaderFull():
             if len(variant_idx_not_found) >0:
                 not_found_variants = [variant_ids[i] for i in variant_idx_not_found]
             
-                print(f'Totally {len(not_found_variants)} not founded, part of them are {",".join(not_found_variants)[:10]}.')
+                print(f'Totally {len(not_found_variants)} not founded, part of them are {",".join(not_found_variants[:10])}.')
                 variant_idx = [i for i in variant_idx if i is not None]
                 variant_ids = [i for i in variant_ids if i not in not_found_variants]
 
