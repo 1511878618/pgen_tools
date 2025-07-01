@@ -139,7 +139,7 @@ def burdenSet(df, method = "carrier"):
     if method == "carrier":
         df_carrier = (df.sum(axis=1) >= 1).astype(int).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
-        df_carrier.rename(columns={method: f"{method}"}, inplace=True)
+        # df_carrier.rename(columns={method: f"{method}"}, inplace=True)
         print(df_carrier[f"{method}"].value_counts())
     elif method == "sum":
         df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
@@ -183,6 +183,7 @@ if __name__ == "__main__":
     if pfile is not None and pfile_folder is None:  # only use one pfile to extract
         pgen = PgenReaderFull(pfile_path=pfile)
         variant_ids = pd.read_csv(sfile).iloc[:, 0].tolist()
+        print(variant_ids[:4])
         df = pgen.extract(variant_ids =variant_ids,
                         asFrame=True, na_rep=np.nan)
         df_carrier = burdenSet(df, method)
