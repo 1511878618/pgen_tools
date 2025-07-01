@@ -139,8 +139,8 @@ def burdenSet(df, method = "carrier"):
     if method == "carrier":
         df_carrier = (df.sum(axis=1) >= 1).astype(int).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
-        df_carrier.rename(columns={method: f"{method}_{groupName}"}, inplace=True)
-        print(df_carrier[f"{method}_{groupName}"].value_counts())
+        df_carrier.rename(columns={method: f"{method}"}, inplace=True)
+        print(df_carrier[f"{method}"].value_counts())
     elif method == "sum":
         df_carrier = df.sum(axis=1).to_frame().reset_index(drop=False)
         df_carrier.columns = ["eid",method]
@@ -180,17 +180,18 @@ if __name__ == "__main__":
         print("Please do not provide pgen file and pgen folder at the same time")
         sys.exit(1)
 
-    if pfile is not None:  # only use one pfile to extract 
+    if pfile is not None and pfile_folder is None:  # only use one pfile to extract
         pgen = PgenReaderFull(pfile_path=pfile)
         variant_ids = pd.read_csv(sfile).iloc[:, 0].tolist()
         df = pgen.extract(variant_ids =variant_ids,
                         asFrame=True, na_rep=np.nan)
         df_carrier = burdenSet(df, method)
         if ofile.endswith(".csv"):
+
             df_carrier.to_csv(ofile, index=False)
         elif ofile.endswith(".tsv"):
             df_carrier.to_csv(ofile, index=False, sep="\t")
-    elif pfile_folder is not None:
+    elif pfile_folder is not None and pfile is None:
         if chrom is None and group is None:
             print("Please provide chromosome number and group column")
             sys.exit(1)
@@ -217,7 +218,9 @@ if __name__ == "__main__":
 
             # only for carrier
             print(df.sum(axis=0))
-            df_burden = burdenSet(df, method = method)
+            df_burden = burdenSet(df, method=method).rename(
+                columns={f"{method}": f"{method}_{groupName}"}
+            )
 
             # if df_burden[f'{method}_{groupName}'].sum() >1:
             if df.shape[0] == 0:

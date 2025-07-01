@@ -175,7 +175,9 @@ class PgenReaderFull():
         return buf[:, sample_idx]
     def read_list(self, variant_idxs:list,  allele_idx=1, sample_idx=None) -> np.ndarray:
         """
-        from PgenReader.read_list
+        from PgenReader.read_list;
+
+        if Sample is too large ,this will cost lots of memory; This situation, recommend to use plink2 split files
         """
         sample_idx = np.array(sample_idx) if sample_idx is not None else np.array(range(self.sample_ct))
 
@@ -187,6 +189,22 @@ class PgenReaderFull():
                             allele_idx = allele_idx,
                             )
         return buf[:, sample_idx]
+
+    # def read_list(self, variant_idxs:list,  allele_idx=1, sample_idx=None) -> np.ndarray:
+    #     """
+    #     from PgenReader.read_list
+    #     """
+    #     sample_idx = np.array(sample_idx) if sample_idx is not None else np.array(range(self.sample_ct))
+
+    #     buf = np.empty((len(variant_idxs), len(sample_idx)), dtype=np.int32) # shape (variant_nums, sample_nums)
+    #     print(buf.shape)
+    #     variant_idxs_array = np.array(variant_idxs, dtype=np.uint32)
+    #     self.pgen.read_list(variant_idxs = variant_idxs_array, 
+    #                         geno_int_out = buf,
+    #                         allele_idx = allele_idx,
+    #                         )
+    #     # return buf[:, sample_idx]
+    #     return buf 
 
     @overload
     def extract(self, variant_idx:List[int],allele_idx=1, sample_idx=None, asFrame = False)-> np.ndarray:...
@@ -240,7 +258,8 @@ class PgenReaderFull():
             variant_idx_not_found = [index for index in range(len(variant_idx)) if variant_idx[index] is None]
             if len(variant_idx_not_found) >0:
                 not_found_variants = [variant_ids[i] for i in variant_idx_not_found]
-                print(f'{",".join(not_found_variants)} not found in dataset')
+            
+                print(f'Totally {len(not_found_variants)} not founded, part of them are {",".join(not_found_variants)[:10]}.')
                 variant_idx = [i for i in variant_idx if i is not None]
                 variant_ids = [i for i in variant_ids if i not in not_found_variants]
 
