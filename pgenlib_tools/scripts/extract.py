@@ -146,7 +146,7 @@ def burdenSet(df, method = "carrier"):
         df_carrier.columns = ["eid",method]
 
     elif method == None or "none":
-        df_carrier = df
+        df_carrier = df.reset_index(drop=False, name="eid")
 
     else:
         raise NotImplementedError(f"Not implemented for {method}")
